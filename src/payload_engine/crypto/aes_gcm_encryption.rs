@@ -4,6 +4,8 @@ use aes_gcm::{
 };
 use rand::Rng;
 
+/// Encrypts the given payload using AES-GCM with the given key.
+/// Returns the encrypted payload as a byte vector.
 pub fn aes_gcm_encrypt(key: &[u8], payload: &[u8]) -> Result<Vec<u8>, String> {
     if key.len() != 32 {
         return Err("Invalid key length".to_string());
@@ -24,6 +26,8 @@ pub fn aes_gcm_encrypt(key: &[u8], payload: &[u8]) -> Result<Vec<u8>, String> {
     Ok(result)
 }
 
+/// Decrypts the given encrypted payload using AES-GCM with the given key.
+/// Returns the decrypted payload as a byte vector.
 pub fn aes_gcm_decrypt(key: &[u8], encrypted_payload: &[u8]) -> Result<Vec<u8>, String> {
     if encrypted_payload.len() < 28 {
         return Err("Encrypted packet to short".to_string());
