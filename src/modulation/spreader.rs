@@ -10,6 +10,16 @@ impl Spreader {
         Self { spread_factor: 64 }
     }
 
+    /// Spreads the given bits into the output buffer.
+    /// The output buffer must be pre-allocated with the correct size.
+    ///
+    /// # Arguments
+    /// * `bits` - The bits to spread.
+    /// * `pn_chips` - The PN chips to spread.
+    /// * `output_chips` - The output buffer to write the spreaded bits to.
+    ///
+    /// # Panics
+    /// Panics if the output buffer is not large enough to hold the spreaded bits.
     pub fn spread_block(&self, bits: &[u8], pn_chips: &[f32], output_chips: &mut [f32]) {
         let sf = self.spread_factor;
 
