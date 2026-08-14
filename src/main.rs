@@ -1,3 +1,5 @@
+mod dsp;
+mod modulation;
 mod payload_engine;
 
 fn main() {
