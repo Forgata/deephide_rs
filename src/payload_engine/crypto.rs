@@ -1,5 +1,5 @@
-mod aes_gcm_encryption;
-mod derive_key;
+pub mod aes_gcm_encryption;
+pub mod derive_key;
 
 #[cfg(test)]
 /// **Tests were created using AI. no part of the original project implementation used AI.**
