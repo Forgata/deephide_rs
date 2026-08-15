@@ -58,4 +58,26 @@ mod tests {
             assert!(val == 1.0 || val == -1.0);
         }
     }
+
+    #[test]
+    fn test_pn_generator_receiver_recreation() {
+        let shared_secret_seed: [u8; 32] = [101; 32];
+        let stream_length = 512;
+
+        // 1. Transmitter Side: Generates chips to embed
+        let mut tx_generator = PnGenerator::new(shared_secret_seed);
+        let mut tx_cached_chips = vec![0.0f32; stream_length];
+        tx_generator.fill_sequence(&mut tx_cached_chips);
+
+        // 2. Receiver Side: Re-instantiates generator later with the same seed
+        let mut rx_generator = PnGenerator::new(shared_secret_seed);
+        let mut rx_recreated_chips = vec![0.0f32; stream_length];
+        rx_generator.fill_sequence(&mut rx_recreated_chips);
+
+        // 3. Verify absolute matching across the execution divide
+        assert_eq!(
+            tx_cached_chips, rx_recreated_chips,
+            "Receiver failed to perfectly recreate the deterministic reference PN stream!"
+        );
+    }
 }

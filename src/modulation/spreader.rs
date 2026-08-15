@@ -49,6 +49,30 @@ impl Spreader {
             }
         }
     }
+
+    /// Correlates a single frame of extracted chips against a reference PN sequence window.
+    /// Returns a `1` bit if correlation is positive, or a `0` bit if negative.
+    /// Performs ZERO heap allocations.
+    ///
+    /// ### Arguments
+    /// * `extracted_chips` - Precisely 64 raw chips pulled from an audio spectrum frame.
+    /// * `pn_chips` - The reference PN chips corresponding to this specific frame's window.
+    pub fn despread_block(&self, extracted_chips: &[f32], pn_chips: &[f32]) -> u8 {
+        let sf = self.spread_factor;
+        assert_eq!(
+            extracted_chips.len(),
+            sf,
+            "Extracted chips must match spreading factor!"
+        );
+        assert!(pn_chips.len() >= sf, "PN chips slice window is too small!");
+
+        let mut correlation = 0.0f32;
+        for i in 0..sf {
+            correlation += extracted_chips[i] * pn_chips[i];
+        }
+
+        if correlation > 0.0 { 1 } else { 0 }
+    }
 }
 
 #[cfg(test)]
@@ -84,5 +108,26 @@ mod tests {
         for i in 64..128 {
             assert_eq!(allocated_output[i], -pn_chips[i]);
         }
+    }
+
+    #[test]
+    fn test_spreader_symmetrical_loopback() {
+        let spreader = Spreader::new();
+        let sf = spreader.spread_factor;
+
+        // 1. Create a reference bipolar PN sequence window
+        let pn_chips = vec![1.0f32; sf]; // Simple uniform PN vector for testing mathematical sign isolation
+
+        // 2. Test spreading a Bit 1 and recovering it via despreading
+        let mut out_chips_1 = vec![0.0f32; sf];
+        spreader.spread_block(&[1], &pn_chips, &mut out_chips_1);
+        let recovered_bit_1 = spreader.despread_block(&out_chips_1, &pn_chips);
+        assert_eq!(recovered_bit_1, 1);
+
+        // 3. Test spreading a Bit 0 and recovering it via despreading
+        let mut out_chips_0 = vec![0.0f32; sf];
+        spreader.spread_block(&[0], &pn_chips, &mut out_chips_0);
+        let recovered_bit_0 = spreader.despread_block(&out_chips_0, &pn_chips);
+        assert_eq!(recovered_bit_0, 0);
     }
 }
