@@ -14,3 +14,6 @@ reed-solomon-erasure = "6.0.0"
 
 rustfft = "6.4.1"
 hound = "3.5.1"
+
+rtrb = "0.3.4"
+cpal = "0.18.1"
