@@ -21,7 +21,7 @@ pub struct Payload {
     pub encrypted_payload_bits: Vec<u8>,
     pub salt: [u8; 16],
     pub key: [u8; 32],
-    encrypted_len: usize,
+    pub encrypted_len: usize,
 }
 
 /// # Prep Payload
